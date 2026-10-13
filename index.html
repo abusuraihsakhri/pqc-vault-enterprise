@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101828">
+  <meta name="description" content="A browser-only reference for ML-KEM-768 encryption and ML-DSA-65 signatures.">
+  <title>PQC Vault — cryptography reference workspace</title>
+</head>
+<body>
+  <a class="skip" href="#workspace">Skip to workspace</a>
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="identity"><span class="identity-mark" aria-hidden="true">P/Q</span><span>PQC Vault <small>REFERENCE WORKSPACE</small></span></div>
+      <span class="session-chip" id="session-chip">No active session</span>
+    </header>
+    <main id="workspace">
+      <div class="intro">
+        <div><span class="eyebrow">POST-QUANTUM CRYPTOGRAPHY</span>
+          <h1>Key material, sealed messages, verified signatures.</h1>
+          <p>Explore ML-KEM-768 and ML-DSA-65 with keys generated locally in your browser. Nothing is sent to a server by this application.</p>
+        </div>
+        <div class="intro-meta"><span class="meta-label">SESSION MODE</span><strong>Ephemeral</strong><span>Browser memory only</span></div>
+      </div>
+      <div class="notice" role="note"><strong>Educational reference, not an enterprise vault.</strong> No persistent key storage, identity authentication, access control, hardware security module, recovery, or security certification. Do not enter sensitive or production data.</div>
+      <div class="workspace">
+        <section class="panel key-panel" aria-labelledby="key-title">
+          <div class="panel-heading"><div><span class="eyebrow">01 / KEY MATERIAL</span><h2 id="key-title">Create a local session</h2></div><span class="dot" id="key-dot" aria-hidden="true"></span></div>
+          <p class="muted">Generate independent KEM and signature key pairs. Private keys stay inside the JavaScript session object until cleared or the page closes.</p>
+          <div class="button-row">
+            <button id="generate" class="primary" type="button">Generate key pairs</button>
+            <button id="clear" class="secondary" type="button" disabled>Clear session</button>
+          </div>
+          <div class="key-details">
+            <div><span class="field-label">ML-KEM-768 · public key fingerprint</span><output id="kem-id" class="fingerprint">Not generated</output></div>
+            <div><span class="field-label">ML-DSA-65 · public key fingerprint</span><output id="dsa-id" class="fingerprint">Not generated</output></div>
+          </div>
+          <details class="public-keys">
+            <summary>Inspect / copy public keys</summary>
+            <div class="field"><label for="kem-public">ML-KEM-768 public key · base64url</label><textarea id="kem-public" rows="2" readonly spellcheck="false"></textarea><button type="button" class="text-button" id="copy-kem" data-requires-session disabled>Copy KEM public key</button></div>
+            <div class="field"><label for="dsa-public">ML-DSA-65 public key · base64url</label><textarea id="dsa-public" rows="2" readonly spellcheck="false"></textarea><button type="button" class="text-button" id="copy-dsa" data-requires-session disabled>Copy signature public key</button></div>
+          </details>
+        </section>
+        <section class="panel encryption-panel" aria-labelledby="seal-title">
+          <div class="panel-heading"><div><span class="eyebrow">02 / CONFIDENTIALITY</span><h2 id="seal-title">Seal and open a message</h2></div><span class="algorithm">ML-KEM + AES-GCM</span></div>
+          <p class="muted">Seal text to this session's KEM public key. The JSON envelope carries the encapsulation ciphertext, salt, nonce, and authenticated ciphertext.</p>
+          <div class="field"><label for="message">Text to seal <span>64 KiB max</span></label><textarea id="message" rows="3" maxlength="65536" placeholder="Enter non-sensitive demo text"></textarea></div>
+          <div class="button-row"><button id="seal" class="primary" type="button" data-requires-session disabled>Seal message</button><button id="open" class="secondary" type="button" data-requires-session disabled>Open envelope</button></div>
+          <div class="field"><label for="envelope">Sealed envelope · JSON</label><textarea id="envelope" rows="5" spellcheck="false" placeholder="Generated ciphertext appears here, or paste an envelope from this session"></textarea></div>
+          <div class="field"><label for="opened">Opened plaintext</label><textarea id="opened" rows="2" readonly placeholder="Decrypted text appears here"></textarea></div>
+        </section>
+        <section class="panel signing-panel" aria-labelledby="sign-title">
+          <div class="panel-heading"><div><span class="eyebrow">03 / AUTHENTICITY</span><h2 id="sign-title">Sign and verify text</h2></div><span class="algorithm">ML-DSA-65</span></div>
+          <p class="muted">Sign with the session's signing key, then verify against its public key. Change the message to see verification fail.</p>
+          <div class="field"><label for="sign-message">Message to sign <span>64 KiB max</span></label><textarea id="sign-message" rows="3" maxlength="65536" placeholder="Enter a message to sign"></textarea></div>
+          <div class="button-row"><button id="sign" class="primary" type="button" data-requires-session disabled>Sign message</button><button id="verify" class="secondary" type="button" data-requires-session disabled>Verify signature</button></div>
+          <div class="field"><label for="signature">Signature · base64url</label><textarea id="signature" rows="4" spellcheck="false" placeholder="ML-DSA-65 signature appears here"></textarea></div>
+          <p id="verification" class="verification" aria-live="polite">No signature verified.</p>
+        </section>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite">Ready. Generate a local session to begin.</div>
+      <section class="technical" aria-label="Implementation limits">
+        <div><span class="eyebrow">DESIGN</span><h2>Session-scoped by design</h2></div>
+        <p>The browser generates random keys and nonces, then encrypts entirely on the client. Refreshing or clearing the session loses the decryption and signing keys. Public keys, envelopes, and signatures can be copied; private keys cannot be exported.</p>
+        <p>Web Crypto provides HKDF and AES-GCM. The JavaScript post-quantum implementation is not guaranteed constant-time and is not independently security-audited. A browser session is not a substitute for managed custody, authenticated key exchange, or a production cryptographic service.</p>
+      </section>
+    </main>
+    <footer>Reference implementation · FIPS 203 (ML-KEM) / FIPS 204 (ML-DSA) · <a href="https://github.com/abusuraihsakhri/pqc-vault-enterprise" rel="noopener noreferrer">Source repository</a></footer>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
